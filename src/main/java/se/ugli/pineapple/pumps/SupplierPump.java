@@ -8,19 +8,13 @@ import java.util.function.Supplier;
 public class SupplierPump<T> implements Pump<T> {
 
     private final Supplier<T> supplier;
-    private Consumer<T> consumer;
 
     public SupplierPump(Supplier<T> supplier) {
         this.supplier = supplier;
     }
 
     @Override
-    public void setup(Consumer<T> consumer) {
-        this.consumer = consumer;
-    }
-
-    @Override
-    public void start() {
+    public void start(Consumer<T> consumer) {
         consumer.accept(supplier.get());
     }
 }

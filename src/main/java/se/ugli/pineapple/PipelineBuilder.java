@@ -42,14 +42,14 @@ public class PipelineBuilder<T> {
         else if (pipes.size() - 1 != filters.size())
             throw new IllegalStateException("Number of filters has to be one less then the number of pipes");
         Pipe<T> lastPipe = pipes.poll();
-        pump.setup(lastPipe);
+        Consumer<T> pumpSupplier = lastPipe;
         while (!pipes.isEmpty()) {
             final Pipe<T> pipe = pipes.poll();
             lastPipe.setup(pipe, Optional.of(filters.poll()));
             lastPipe = pipe;
         }
         lastPipe.setup(sink, Optional.empty());
-        return new Pipeline<>(pump);
+        return new Pipeline<>(pump, pumpSupplier);
     }
 
 }

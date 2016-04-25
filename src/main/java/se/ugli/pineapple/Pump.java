@@ -2,10 +2,9 @@ package se.ugli.pineapple;
 
 import java.util.function.Consumer;
 
+@FunctionalInterface
 public interface Pump<T> {
 
-    void setup(final Consumer<T> consumer);
-
-    void start();
+    void start(Consumer<T> consumer);
 
 }
