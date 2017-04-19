@@ -1,6 +1,5 @@
 package se.ugli.pineapple.discovery;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import se.ugli.pineapple.api.Filter;
@@ -20,10 +19,11 @@ public interface Discovery {
         return new Pipe("ram:/" + name);
     }
 
+    // TODO
+    static Discovery discovery = new SpringDiscovery(new AnnotationConfigApplicationContext("se.ugli"));
+
     public static Discovery create() {
-        // TODO
-        final ApplicationContext ctx = new AnnotationConfigApplicationContext("se.ugli");
-        return new SpringDiscovery(ctx);
+        return discovery;
     }
 
 }

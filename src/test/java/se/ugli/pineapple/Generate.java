@@ -11,8 +11,6 @@ public class Generate implements Filter {
 
     @Override
     public Envelope filter(final Message message) {
-        System.out.println(message);
-        System.out.println(getClass());
         return new Envelope(message);
     }
 

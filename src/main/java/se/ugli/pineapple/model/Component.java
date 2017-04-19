@@ -1,11 +1,20 @@
 package se.ugli.pineapple.model;
 
 import static java.util.Collections.unmodifiableList;
+import static se.ugli.pineapple.model.Component.Type.Filter;
+import static se.ugli.pineapple.model.Component.Type.Pump;
+import static se.ugli.pineapple.model.Component.Type.Sink;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import se.ugli.pineapple.PineappleException;
+
 public class Component {
+
+    public enum Type {
+        Pump, Filter, Sink
+    }
 
     public final String name;
     private final List<Pipe> in = new ArrayList<>();
@@ -40,7 +49,20 @@ public class Component {
     }
 
     boolean isFilter() {
-        return !isPump() && !isSink();
+        return !in.isEmpty() && !out.isEmpty();
+    }
+
+    public Type type() {
+        if (isPump()) {
+            return Pump;
+        }
+        if (isFilter()) {
+            return Filter;
+        }
+        if (isSink()) {
+            return Sink;
+        }
+        throw new PineappleException("No defined type: " + name);
     }
 
     @Override

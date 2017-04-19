@@ -11,9 +11,7 @@ public class Transform implements Filter {
 
     @Override
     public Envelope filter(final Message message) {
-        System.out.println(message);
-        System.out.println(getClass());
-        return new Envelope(message);
+        return new Envelope(Message.builder().body(message.body()).build());
     }
 
 }
