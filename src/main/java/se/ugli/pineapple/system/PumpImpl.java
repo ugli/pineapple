@@ -1,4 +1,4 @@
-package se.ugli.pineapple.impl;
+package se.ugli.pineapple.system;
 
 import java.io.Closeable;
 import java.util.function.Consumer;

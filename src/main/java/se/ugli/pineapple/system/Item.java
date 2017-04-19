@@ -1,4 +1,4 @@
-package se.ugli.pineapple.impl;
+package se.ugli.pineapple.system;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

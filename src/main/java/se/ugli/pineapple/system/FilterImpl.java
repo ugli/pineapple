@@ -1,4 +1,4 @@
-package se.ugli.pineapple.impl;
+package se.ugli.pineapple.system;
 
 import static java.util.Objects.isNull;
 
