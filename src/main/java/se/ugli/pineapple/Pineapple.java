@@ -1,7 +1,6 @@
 package se.ugli.pineapple;
 
 import akka.actor.ActorSystem;
-import akka.actor.Props;
 import akka.actor.Terminated;
 import scala.concurrent.Future;
 import se.ugli.java.io.Resource;
@@ -14,15 +13,16 @@ import se.ugli.pineapple.system.SinkActor;
 
 public class Pineapple {
 
-    private static final ActorSystem actorSystem = ActorSystem.create("pineapple");
+    private static ActorSystem actorSystem;
 
     private Pineapple() {
     }
 
     public static void start(final Model model, final Discovery discovery) {
-        model.pumps.forEach(c -> actorSystem.actorOf(Props.create(PumpActor.class, c, discovery)));
-        model.filters.forEach(c -> actorSystem.actorOf(Props.create(FilterActor.class, c, discovery)));
-        model.sinks.forEach(c -> actorSystem.actorOf(Props.create(SinkActor.class, c, discovery)));
+        actorSystem = ActorSystem.create("pineapple");
+        model.pumps.forEach(c -> actorSystem.actorOf(PumpActor.props(c, discovery)));
+        model.filters.forEach(c -> actorSystem.actorOf(FilterActor.props(c, discovery)));
+        model.sinks.forEach(c -> actorSystem.actorOf(SinkActor.props(c, discovery)));
     }
 
     public static Future<Terminated> stop() {

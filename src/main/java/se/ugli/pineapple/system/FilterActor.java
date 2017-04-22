@@ -1,7 +1,9 @@
 package se.ugli.pineapple.system;
 
-import static java.util.Objects.isNull;
+import java.util.Optional;
+import java.util.Set;
 
+import akka.actor.Props;
 import se.ugli.jocote.Connection;
 import se.ugli.jocote.Message;
 import se.ugli.pineapple.PineappleException;
@@ -14,27 +16,29 @@ public class FilterActor extends ComponentActor {
 
     private final Filter filter;
 
-    public FilterActor(Component component, Discovery discovery) {
+    public FilterActor(final Component component, final Discovery discovery) {
         super(component, discovery);
         filter = discovery.filter(component.name);
     }
 
+    public static Props props(final Component component, final Discovery discovery) {
+        return Props.create(FilterActor.class, () -> new FilterActor(component, discovery));
+    }
+
     @Override
-    protected void consume(Message message) {
-        final Envelope envelope = filter.filter(message);
-        if (connectionByDestination.size() == 1) {
-            connectionByDestination.values().iterator().next().put(envelope.message);
-        } else {
-            if (isNull(envelope.destination) && connectionByDestination.size() > 1) {
-                throw new PineappleException("You have to choose destination: " + connectionByDestination.keySet());
-            }
-            final Connection connection = connectionByDestination.get(envelope.destination);
-            if (isNull(connection)) {
-                throw new PineappleException("Bad destination: " + envelope.destination + ". Valid are: "
-                        + connectionByDestination.keySet());
-            }
-            connection.put(envelope.message);
-        }
+    protected void consume(final Message inMsg) {
+        final Envelope envelope = filter.filter(inMsg);
+        connection(envelope.destination).put(envelope.message);
+    }
+
+    private Connection connection(final Optional<String> optionalDestination) {
+        if (connectionByDestination.size() == 1)
+            return connectionByDestination.values().iterator().next();
+        final Set<String> validDestinations = connectionByDestination.keySet();
+        final String destination = optionalDestination
+                .orElseThrow(() -> new PineappleException("You have to choose destination: " + validDestinations));
+        return Optional.ofNullable(connectionByDestination.get(destination)).orElseThrow(
+                () -> new PineappleException("Bad destination: " + destination + ". Valid are: " + validDestinations));
     }
 
 }
