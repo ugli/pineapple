@@ -7,9 +7,7 @@ import se.ugli.java.io.Resource;
 import se.ugli.pineapple.discovery.Discovery;
 import se.ugli.pineapple.model.Model;
 import se.ugli.pineapple.model.ModelBuilder;
-import se.ugli.pineapple.system.FilterActor;
-import se.ugli.pineapple.system.PumpActor;
-import se.ugli.pineapple.system.SinkActor;
+import se.ugli.pineapple.system.PineappleActor;
 
 public class Pineapple {
 
@@ -20,9 +18,7 @@ public class Pineapple {
 
     public static void start(final Model model, final Discovery discovery) {
         actorSystem = ActorSystem.create("pineapple");
-        model.pumps.forEach(c -> actorSystem.actorOf(PumpActor.props(c, discovery)));
-        model.filters.forEach(c -> actorSystem.actorOf(FilterActor.props(c, discovery)));
-        model.sinks.forEach(c -> actorSystem.actorOf(SinkActor.props(c, discovery)));
+        actorSystem.actorOf(PineappleActor.props(model, discovery));
     }
 
     public static Future<Terminated> stop() {
