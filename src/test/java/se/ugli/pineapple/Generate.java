@@ -11,7 +11,7 @@ public class Generate implements Filter {
 
     @Override
     public Envelope filter(final Message message) {
-        return new Envelope(message);
+        return Envelope.apply((new String(message.body()) + " G").getBytes());
     }
 
 }

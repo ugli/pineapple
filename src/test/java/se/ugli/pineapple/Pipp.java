@@ -3,7 +3,6 @@ package se.ugli.pineapple;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import se.ugli.jocote.Message;
 import se.ugli.pineapple.api.Envelope;
 import se.ugli.pineapple.api.Filter;
 import se.ugli.pineapple.api.Pipe;
@@ -15,22 +14,22 @@ public class Pipp {
 
     @Bean
     public Pump indata() {
-        return new Pump("activemq:/indata");
+        return new Pump("rabbitmq:/indata");
     }
 
     @Bean
     public Sink utdata() {
-        return new Sink("activemq:/utdata");
+        return new Sink("rabbitmq:/utdata");
     }
 
     @Bean
     public Filter distribute() {
-        return m -> new Envelope(Message.builder().body(m.body()).build());
+        return m -> Envelope.apply((new String(m.body()) + " D").getBytes());
     }
 
     @Bean
     public Pipe generate_distribute() {
-        return new Pipe("activemq:/gen_dist");
+        return new Pipe("rabbitmq:/gen_dist");
     }
 
 }

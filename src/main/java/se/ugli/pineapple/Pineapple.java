@@ -19,8 +19,7 @@ public class Pineapple {
     private Pineapple() {
     }
 
-    public static void start(Model model) {
-        final Discovery discovery = Discovery.create();
+    public static void start(final Model model, final Discovery discovery) {
         model.pumps.forEach(c -> actorSystem.actorOf(Props.create(PumpActor.class, c, discovery)));
         model.filters.forEach(c -> actorSystem.actorOf(Props.create(FilterActor.class, c, discovery)));
         model.sinks.forEach(c -> actorSystem.actorOf(Props.create(SinkActor.class, c, discovery)));
@@ -30,16 +29,20 @@ public class Pineapple {
         return actorSystem.terminate();
     }
 
-    public static void start(byte[] dotData) {
-        start(ModelBuilder.apply().dotData(dotData).build());
+    public static void start(final byte[] dotData, final Discovery discovery) {
+        start(ModelBuilder.apply().dotData(dotData).build(), discovery);
     }
 
-    public static void start(Resource resource) {
-        start(resource.asBytes());
+    public static void start(final Resource resource, final Discovery discovery) {
+        start(resource.asBytes(), discovery);
+    }
+
+    public static void start(final Resource resource) {
+        start(resource, Discovery.create());
     }
 
     public static void start() {
-        start(Resource.apply("/pineapple.dot"));
+        start(Resource.apply("/pineapple.dot"), Discovery.create());
     }
 
 }

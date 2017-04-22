@@ -11,7 +11,7 @@ public class Transform implements Filter {
 
     @Override
     public Envelope filter(final Message message) {
-        return new Envelope(Message.builder().body(message.body()).build());
+        return Envelope.apply((new String(message.body()) + " T").getBytes());
     }
 
 }
