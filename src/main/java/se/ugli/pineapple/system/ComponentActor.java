@@ -18,15 +18,14 @@ import se.ugli.pineapple.model.Component;
 
 abstract class ComponentActor extends AbstractActor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ComponentActor.class);
-
+    protected final Logger log = LoggerFactory.getLogger(getClass());
     protected final List<Subscription> subscriptions = new ArrayList<>();
     protected final Map<String, Connection> connectionByDestination = new HashMap<>();
 
     protected ComponentActor(final Component component, final Discovery discovery) {
         component.getIn().forEach(p -> addSubscription(discovery.pipe(p.name).url));
         component.getOut().forEach(p -> addConnection(p.to.name, discovery.pipe(p.name).url));
-        LOG.info("{} {} created.", component.type(), component.name);
+        log.info("{} {} created", component.type(), component.name);
     }
 
     protected void addSubscription(final String url) {
@@ -51,7 +50,7 @@ abstract class ComponentActor extends AbstractActor {
     protected abstract void consume(Message message);
 
     private void unknown(final Object message) {
-        LOG.warn("Received unknown message: {}", message);
+        throw new IllegalStateException("Unknown message type: " + message.getClass().getName());
     }
 
 }
