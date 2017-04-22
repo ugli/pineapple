@@ -13,23 +13,28 @@ import se.ugli.jocote.Connection;
 import se.ugli.jocote.Jocote;
 import se.ugli.jocote.Message;
 import se.ugli.jocote.Subscription;
-import se.ugli.pineapple.api.Pipe;
 import se.ugli.pineapple.discovery.Discovery;
 import se.ugli.pineapple.model.Component;
 
 abstract class ComponentActor extends AbstractActor {
 
-    protected final Logger LOG = LoggerFactory.getLogger(getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(ComponentActor.class);
+
     protected final List<Subscription> subscriptions = new ArrayList<>();
     protected final Map<String, Connection> connectionByDestination = new HashMap<>();
 
-    protected ComponentActor(Component component, Discovery discovery) {
+    protected ComponentActor(final Component component, final Discovery discovery) {
         component.getIn().forEach(p -> addSubscription(discovery.pipe(p.name).url));
-        component.getOut().forEach(p -> {
-            final Pipe pipe = discovery.pipe(p.name);
-            connectionByDestination.put(p.to.name, Jocote.connect(pipe.url));
-        });
+        component.getOut().forEach(p -> addConnection(p.to.name, discovery.pipe(p.name).url));
         LOG.info("{} {} created.", component.type(), component.name);
+    }
+
+    protected void addSubscription(final String url) {
+        subscriptions.add(Jocote.subscribe(url, m -> self().tell(m, self())));
+    }
+
+    protected void addConnection(final String destination, final String url) {
+        connectionByDestination.put(destination, Jocote.connect(url));
     }
 
     @Override
@@ -43,13 +48,9 @@ abstract class ComponentActor extends AbstractActor {
         return receiveBuilder().match(Message.class, this::consume).matchAny(this::unknown).build();
     }
 
-    protected void addSubscription(String url) {
-        subscriptions.add(Jocote.subscribe(url, m -> self().tell(m, self())));
-    }
-
     protected abstract void consume(Message message);
 
-    private void unknown(Object message) {
+    private void unknown(final Object message) {
         LOG.warn("Received unknown message: {}", message);
     }
 
