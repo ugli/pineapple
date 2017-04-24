@@ -1,11 +1,8 @@
-package se.ugli.pineapple.discovery;
+package se.ugli.pineapple.api;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import se.ugli.pineapple.api.Filter;
-import se.ugli.pineapple.api.Pipe;
-import se.ugli.pineapple.api.Pump;
-import se.ugli.pineapple.api.Sink;
+import se.ugli.pineapple.discovery.SpringDiscovery;
 
 public interface Discovery {
 
@@ -16,7 +13,7 @@ public interface Discovery {
     Sink sink(String name);
 
     default Pipe pipe(final String name) {
-        return new Pipe("ram:/" + name);
+        return Pipe.apply("ram:/" + name);
     }
 
     // TODO

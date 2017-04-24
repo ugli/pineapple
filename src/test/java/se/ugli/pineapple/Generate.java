@@ -14,4 +14,9 @@ public class Generate implements Filter {
         return Envelope.apply((new String(message.body()) + " G").getBytes());
     }
 
+    @Override
+    public int numberOfInstances() {
+        return 2;
+    }
+
 }

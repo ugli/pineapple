@@ -1,35 +1,41 @@
 package se.ugli.pineapple.api;
 
-public class Sink {
+import scala.concurrent.duration.FiniteDuration;
+import se.ugli.pineapple.api.BaseConfiguration.ConfigurationBuilder;
 
-    public final String url;
-    public final int numberOfInstances;
+@FunctionalInterface
+public interface Sink extends Url, Configuration {
 
-    private Sink(final String url, final int numberOfInstances) {
-        this.url = url;
-        this.numberOfInstances = numberOfInstances;
+    static SinkBuilder builder(final String url) {
+        return new SinkBuilder(url);
     }
 
-    public static Builder builder(final String url) {
-        return new Builder(url);
-    }
+    static class SinkBuilder extends ConfigurationBuilder<SinkBuilder> {
 
-    public static class Builder {
+        final String url;
 
-        private final String url;
-        private int numberOfInstances = 1;
-
-        Builder(final String url) {
+        SinkBuilder(final String url) {
             this.url = url;
         }
 
-        public Builder numberOfInstances(final int numberOfInstances) {
-            this.numberOfInstances = numberOfInstances;
-            return this;
+        public Sink build() {
+            return new SinkImpl(url, numberOfInstances, consumeType, idleDuration());
         }
 
-        public Sink build() {
-            return new Sink(url, numberOfInstances);
+        class SinkImpl extends BaseConfiguration implements Sink {
+            final String url;
+
+            SinkImpl(final String url, final int numberOfInstances, final ConsumeType consumeType,
+                    final FiniteDuration idleDuration) {
+                super(numberOfInstances, consumeType, idleDuration);
+                this.url = url;
+            }
+
+            @Override
+            public String url() {
+                return url;
+            }
+
         }
 
     }

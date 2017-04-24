@@ -1,35 +1,42 @@
 package se.ugli.pineapple.api;
 
-public class Pump {
+import scala.concurrent.duration.FiniteDuration;
+import se.ugli.pineapple.api.BaseConfiguration.ConfigurationBuilder;
 
-    public final String url;
-    public final int numberOfInstances;
+@FunctionalInterface
+public interface Pump extends Url, Configuration {
 
-    private Pump(final String url, final int numberOfInstances) {
-        this.url = url;
-        this.numberOfInstances = numberOfInstances;
+    static PumpBuilder builder(final String url) {
+        return new PumpBuilder(url);
     }
 
-    public static Builder builder(final String url) {
-        return new Builder(url);
-    }
-
-    public static class Builder {
+    static class PumpBuilder extends ConfigurationBuilder<PumpBuilder> {
 
         private final String url;
-        private int numberOfInstances = 1;
 
-        Builder(final String url) {
+        PumpBuilder(final String url) {
             this.url = url;
         }
 
-        public Builder numberOfInstances(final int numberOfInstances) {
-            this.numberOfInstances = numberOfInstances;
-            return this;
+        public Pump build() {
+            return new PumpImpl(url, numberOfInstances, consumeType, idleDuration());
         }
 
-        public Pump build() {
-            return new Pump(url, numberOfInstances);
+        class PumpImpl extends BaseConfiguration implements Pump {
+
+            final String url;
+
+            PumpImpl(final String url, final int numberOfInstances, final ConsumeType consumeType,
+                    final FiniteDuration idleDuration) {
+                super(numberOfInstances, consumeType, idleDuration);
+                this.url = url;
+            }
+
+            @Override
+            public String url() {
+                return url;
+            }
+
         }
 
     }

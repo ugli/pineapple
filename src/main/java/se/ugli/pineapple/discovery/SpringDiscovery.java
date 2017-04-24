@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.context.ApplicationContext;
 
 import se.ugli.pineapple.PineappleException;
+import se.ugli.pineapple.api.Discovery;
 import se.ugli.pineapple.api.Filter;
 import se.ugli.pineapple.api.Pipe;
 import se.ugli.pineapple.api.Pump;

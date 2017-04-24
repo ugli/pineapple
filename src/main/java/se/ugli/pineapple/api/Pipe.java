@@ -1,11 +1,25 @@
 package se.ugli.pineapple.api;
 
-public class Pipe {
+@FunctionalInterface
+public interface Pipe extends Url {
 
-    public final String url;
+    public static Pipe apply(final String url) {
+        return new PipeImpl(url);
+    }
 
-    public Pipe(final String url) {
-        this.url = url;
+    class PipeImpl implements Pipe {
+
+        final String url;
+
+        PipeImpl(final String url) {
+            this.url = url;
+        }
+
+        @Override
+        public String url() {
+            return url;
+        }
+
     }
 
 }

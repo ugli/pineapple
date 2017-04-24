@@ -13,11 +13,11 @@ import scala.concurrent.duration.Duration;
 import se.ugli.java.io.Resource;
 import se.ugli.jocote.Jocote;
 import se.ugli.jocote.Message;
+import se.ugli.pineapple.api.Discovery;
 import se.ugli.pineapple.api.Envelope;
 import se.ugli.pineapple.api.Filter;
 import se.ugli.pineapple.api.Pump;
 import se.ugli.pineapple.api.Sink;
-import se.ugli.pineapple.discovery.Discovery;
 
 public class PineappleTest {
 

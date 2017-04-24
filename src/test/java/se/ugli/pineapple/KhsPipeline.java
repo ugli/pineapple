@@ -14,12 +14,12 @@ public class KhsPipeline {
 
     @Bean
     public Pump indata() {
-        return Pump.builder("rabbitmq:/indata").build();
+        return () -> "rabbitmq:/indata";
     }
 
     @Bean
     public Sink utdata() {
-        return Sink.builder("rabbitmq:/utdata").build();
+        return () -> "rabbitmq:/utdata";
     }
 
     @Bean
@@ -29,7 +29,7 @@ public class KhsPipeline {
 
     @Bean
     public Pipe generate_distribute() {
-        return new Pipe("rabbitmq:/gen_dist");
+        return () -> "rabbitmq:/gen_dist";
     }
 
 }

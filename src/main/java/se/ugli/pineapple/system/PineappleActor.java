@@ -2,7 +2,7 @@ package se.ugli.pineapple.system;
 
 import akka.actor.AbstractActor;
 import akka.actor.Props;
-import se.ugli.pineapple.discovery.Discovery;
+import se.ugli.pineapple.api.Discovery;
 import se.ugli.pineapple.model.Model;
 
 public class PineappleActor extends AbstractActor {

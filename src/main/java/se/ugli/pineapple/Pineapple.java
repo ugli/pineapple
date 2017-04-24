@@ -4,7 +4,7 @@ import akka.actor.ActorSystem;
 import akka.actor.Terminated;
 import scala.concurrent.Future;
 import se.ugli.java.io.Resource;
-import se.ugli.pineapple.discovery.Discovery;
+import se.ugli.pineapple.api.Discovery;
 import se.ugli.pineapple.model.Model;
 import se.ugli.pineapple.model.ModelBuilder;
 import se.ugli.pineapple.system.PineappleActor;
