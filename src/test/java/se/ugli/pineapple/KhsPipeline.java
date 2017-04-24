@@ -10,16 +10,16 @@ import se.ugli.pineapple.api.Pump;
 import se.ugli.pineapple.api.Sink;
 
 @Configuration
-public class Pipp {
+public class KhsPipeline {
 
     @Bean
     public Pump indata() {
-        return new Pump("rabbitmq:/indata");
+        return Pump.builder("rabbitmq:/indata").build();
     }
 
     @Bean
     public Sink utdata() {
-        return new Sink("rabbitmq:/utdata");
+        return Sink.builder("rabbitmq:/utdata").build();
     }
 
     @Bean

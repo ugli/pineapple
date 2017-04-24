@@ -21,18 +21,22 @@ abstract class ComponentActor extends AbstractActor {
     protected final Logger log = LoggerFactory.getLogger(getClass());
     protected final List<Subscription> subscriptions = new ArrayList<>();
     protected final Map<String, Connection> connectionByDestination = new HashMap<>();
+    private final String componentName;
 
     protected ComponentActor(final Component component, final Discovery discovery) {
+        componentName = component.name;
+        log.info("[{}] creating {}", componentName, component.type());
         component.getIn().forEach(p -> addSubscription(discovery.pipe(p.name).url));
         component.getOut().forEach(p -> addConnection(p.to.name, discovery.pipe(p.name).url));
-        log.info("{} {} created", component.type(), component.name);
     }
 
     protected void addSubscription(final String url) {
+        log.info("[{}] added subscription {}", componentName, url);
         subscriptions.add(Jocote.subscribe(url, m -> self().tell(m, self())));
     }
 
     protected void addConnection(final String destination, final String url) {
+        log.info("[{}] added connection {}", componentName, url);
         connectionByDestination.put(destination, Jocote.connect(url));
     }
 

@@ -1,7 +1,9 @@
 package se.ugli.pineapple.system;
 
 import akka.actor.Props;
+import akka.routing.RoundRobinPool;
 import se.ugli.jocote.Message;
+import se.ugli.pineapple.api.Sink;
 import se.ugli.pineapple.discovery.Discovery;
 import se.ugli.pineapple.model.Component;
 
@@ -13,7 +15,11 @@ public class SinkActor extends ComponentActor {
     }
 
     public static Props props(final Component component, final Discovery discovery) {
-        return Props.create(SinkActor.class, () -> new SinkActor(component, discovery));
+        final Sink sink = discovery.sink(component.name);
+        final Props result = Props.create(SinkActor.class, () -> new SinkActor(component, discovery));
+        if (sink.numberOfInstances > 1)
+            return result.withRouter(new RoundRobinPool(sink.numberOfInstances));
+        return result;
     }
 
     @Override

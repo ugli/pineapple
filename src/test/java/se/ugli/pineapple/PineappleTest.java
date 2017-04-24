@@ -34,16 +34,16 @@ public class PineappleTest {
 
             @Override
             public Pump pump(final String name) {
-                return new Pump(pumpUrl);
+                return Pump.builder(pumpUrl).build();
             }
 
             @Override
             public Sink sink(final String name) {
-                return new Sink(sinkUrl);
+                return Sink.builder(sinkUrl).build();
             }
         });
         Jocote.connect(pumpUrl).put("hej".getBytes());
-        Thread.sleep(4000);
+        Thread.sleep(10000);
         final Message message = Jocote.connect(sinkUrl).get().orElseThrow(() -> new AssertionError("Bad stuff"));
         assertThat(new String(message.body()), is("hej Transform Generate Distribute"));
     }

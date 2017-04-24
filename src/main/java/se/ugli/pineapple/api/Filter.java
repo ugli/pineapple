@@ -7,4 +7,8 @@ public interface Filter {
 
     Envelope filter(Message message);
 
+    static FilterBuilder builder(final Filter filter) {
+        return new FilterBuilder(filter);
+    }
+
 }

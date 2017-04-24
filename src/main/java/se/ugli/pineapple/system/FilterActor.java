@@ -4,11 +4,13 @@ import java.util.Optional;
 import java.util.Set;
 
 import akka.actor.Props;
+import akka.routing.RoundRobinPool;
 import se.ugli.jocote.Connection;
 import se.ugli.jocote.Message;
 import se.ugli.pineapple.PineappleException;
 import se.ugli.pineapple.api.Envelope;
 import se.ugli.pineapple.api.Filter;
+import se.ugli.pineapple.api.FilterBuilder.FilterWithConfiguration;
 import se.ugli.pineapple.discovery.Discovery;
 import se.ugli.pineapple.model.Component;
 
@@ -16,13 +18,20 @@ public class FilterActor extends ComponentActor {
 
     private final Filter filter;
 
-    public FilterActor(final Component component, final Discovery discovery) {
+    public FilterActor(final Filter filter, final Component component, final Discovery discovery) {
         super(component, discovery);
-        filter = discovery.filter(component.name);
+        this.filter = filter;
     }
 
     public static Props props(final Component component, final Discovery discovery) {
-        return Props.create(FilterActor.class, () -> new FilterActor(component, discovery));
+        final Filter filter = discovery.filter(component.name);
+        final Props result = Props.create(FilterActor.class, () -> new FilterActor(filter, component, discovery));
+        if (filter instanceof FilterWithConfiguration) {
+            final FilterWithConfiguration filterWithConf = (FilterWithConfiguration) filter;
+            if (filterWithConf.numberOfInstances > 1)
+                return result.withRouter(new RoundRobinPool(filterWithConf.numberOfInstances));
+        }
+        return result;
     }
 
     @Override
