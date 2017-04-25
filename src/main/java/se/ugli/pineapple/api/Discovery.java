@@ -1,6 +1,7 @@
 package se.ugli.pineapple.api;
 
 import static se.ugli.pineapple.api.Defaults.DISCOVERY;
+import static se.ugli.pineapple.api.Defaults.URL_PREFIX;
 
 public interface Discovery {
 
@@ -11,7 +12,7 @@ public interface Discovery {
     Sink sink(String name);
 
     default Pipe pipe(final String name) {
-        return Pipe.apply(Defaults.URL_PREFIX + ":/" + name);
+        return Pipe.apply(URL_PREFIX + ":/" + name);
     }
 
     public static Discovery create() {

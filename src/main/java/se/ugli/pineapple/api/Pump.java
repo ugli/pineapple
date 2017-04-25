@@ -3,7 +3,9 @@ package se.ugli.pineapple.api;
 import scala.concurrent.duration.FiniteDuration;
 
 @FunctionalInterface
-public interface Pump extends Url, Configuration {
+public interface Pump extends Configuration {
+
+    String url();
 
     static PumpBuilder builder(final String url) {
         return new PumpBuilder(url);

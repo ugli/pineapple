@@ -3,7 +3,9 @@ package se.ugli.pineapple.api;
 import scala.concurrent.duration.FiniteDuration;
 
 @FunctionalInterface
-public interface Sink extends Url, Configuration {
+public interface Sink extends Configuration {
+
+    String url();
 
     static SinkBuilder builder(final String url) {
         return new SinkBuilder(url);

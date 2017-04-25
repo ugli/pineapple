@@ -1,4 +1,4 @@
-package se.ugli.pineapple;
+package se.ugli.pineapple.javaforum;
 
 import java.util.Optional;
 

@@ -1,4 +1,4 @@
-package se.ugli.pineapple;
+package se.ugli.pineapple.javaforum;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

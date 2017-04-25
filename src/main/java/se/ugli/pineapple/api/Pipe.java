@@ -1,7 +1,9 @@
 package se.ugli.pineapple.api;
 
 @FunctionalInterface
-public interface Pipe extends Url {
+public interface Pipe {
+
+    String url();
 
     public static Pipe apply(final String url) {
         return new PipeImpl(url);

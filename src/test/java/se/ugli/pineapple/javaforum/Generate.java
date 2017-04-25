@@ -1,4 +1,4 @@
-package se.ugli.pineapple;
+package se.ugli.pineapple.javaforum;
 
 import java.util.stream.Stream;
 
@@ -12,13 +12,13 @@ import se.ugli.pineapple.api.StreamFilter;
 public class Generate implements StreamFilter {
 
     @Override
-    public int numberOfInstances() {
-        return 2;
+    public Stream<Envelope> filter(final Stream<Message> messages) {
+        return messages.map(m -> Envelope.apply((new String(m.body()) + " G").getBytes()));
     }
 
     @Override
-    public Stream<Envelope> filter(final Stream<Message> messages) {
-        return messages.map(m -> Envelope.apply((new String(m.body()) + " G").getBytes()));
+    public int numberOfInstances() {
+        return 2;
     }
 
 }
