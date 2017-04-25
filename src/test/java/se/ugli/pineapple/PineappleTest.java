@@ -15,7 +15,7 @@ import se.ugli.jocote.Jocote;
 import se.ugli.jocote.Message;
 import se.ugli.pineapple.api.Discovery;
 import se.ugli.pineapple.api.Envelope;
-import se.ugli.pineapple.api.Filter;
+import se.ugli.pineapple.api.SimpleFilter;
 import se.ugli.pineapple.api.Pump;
 import se.ugli.pineapple.api.Sink;
 
@@ -28,7 +28,7 @@ public class PineappleTest {
         Pineapple.start(Resource.apply("/khs.dot"), new Discovery() {
 
             @Override
-            public Filter filter(final String name) {
+            public SimpleFilter filter(final String name) {
                 return m -> Envelope.apply((new String(m.body()) + " " + name).getBytes());
             }
 

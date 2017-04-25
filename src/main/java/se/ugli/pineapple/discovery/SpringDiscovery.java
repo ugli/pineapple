@@ -4,6 +4,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import se.ugli.pineapple.PineappleException;
 import se.ugli.pineapple.api.Discovery;
@@ -18,6 +19,11 @@ public class SpringDiscovery implements Discovery {
 
     public SpringDiscovery(final ApplicationContext cxt) {
         this.cxt = cxt;
+    }
+
+    @SuppressWarnings("resource")
+    public SpringDiscovery() {
+        this(new AnnotationConfigApplicationContext("se", "com"));
     }
 
     @Override

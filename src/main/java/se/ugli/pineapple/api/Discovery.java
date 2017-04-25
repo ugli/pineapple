@@ -1,8 +1,6 @@
 package se.ugli.pineapple.api;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import se.ugli.pineapple.discovery.SpringDiscovery;
+import static se.ugli.pineapple.api.Defaults.DISCOVERY;
 
 public interface Discovery {
 
@@ -13,14 +11,11 @@ public interface Discovery {
     Sink sink(String name);
 
     default Pipe pipe(final String name) {
-        return Pipe.apply("ram:/" + name);
+        return Pipe.apply(Defaults.URL_PREFIX + ":/" + name);
     }
 
-    // TODO
-    static Discovery discovery = new SpringDiscovery(new AnnotationConfigApplicationContext("se.ugli"));
-
     public static Discovery create() {
-        return discovery;
+        return DISCOVERY;
     }
 
 }

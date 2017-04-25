@@ -1,7 +1,6 @@
 package se.ugli.pineapple.api;
 
 import scala.concurrent.duration.FiniteDuration;
-import se.ugli.pineapple.api.BaseConfiguration.ConfigurationBuilder;
 
 @FunctionalInterface
 public interface Sink extends Url, Configuration {
@@ -10,7 +9,7 @@ public interface Sink extends Url, Configuration {
         return new SinkBuilder(url);
     }
 
-    static class SinkBuilder extends ConfigurationBuilder<SinkBuilder> {
+    static class SinkBuilder extends ConfigurationBuilder<SinkBuilder, Sink> {
 
         final String url;
 
@@ -18,16 +17,17 @@ public interface Sink extends Url, Configuration {
             this.url = url;
         }
 
+        @Override
         public Sink build() {
-            return new SinkImpl(url, numberOfInstances, consumeType, idleDuration());
+            return new SinkImpl(url, numberOfInstances, consumeType, idleDuration(), streamLimit);
         }
 
-        class SinkImpl extends BaseConfiguration implements Sink {
+        class SinkImpl extends ConfigurationBase implements Sink {
             final String url;
 
             SinkImpl(final String url, final int numberOfInstances, final ConsumeType consumeType,
-                    final FiniteDuration idleDuration) {
-                super(numberOfInstances, consumeType, idleDuration);
+                    final FiniteDuration idleDuration, final long streamLimit) {
+                super(numberOfInstances, consumeType, idleDuration, streamLimit);
                 this.url = url;
             }
 

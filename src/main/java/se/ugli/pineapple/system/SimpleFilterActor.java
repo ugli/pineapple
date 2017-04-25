@@ -9,22 +9,22 @@ import se.ugli.jocote.Connection;
 import se.ugli.jocote.Message;
 import se.ugli.pineapple.PineappleException;
 import se.ugli.pineapple.api.Discovery;
-import se.ugli.pineapple.api.Envelope;
-import se.ugli.pineapple.api.Filter;
+import se.ugli.pineapple.api.SimpleFilter;
 import se.ugli.pineapple.model.Component;
 
-public class FilterActor extends ComponentActor {
+public class SimpleFilterActor extends ComponentActor {
 
-    private final Filter filter;
+    private final SimpleFilter filter;
 
-    public FilterActor(final Filter filter, final Component component, final Discovery discovery) {
+    public SimpleFilterActor(final SimpleFilter filter, final Component component, final Discovery discovery) {
         super(filter, component, discovery);
         this.filter = filter;
     }
 
     public static Props props(final Component component, final Discovery discovery) {
-        final Filter filter = discovery.filter(component.name);
-        final Props result = Props.create(FilterActor.class, () -> new FilterActor(filter, component, discovery));
+        final SimpleFilter filter = (SimpleFilter) discovery.filter(component.name);
+        final Props result = Props.create(SimpleFilterActor.class,
+                () -> new SimpleFilterActor(filter, component, discovery));
         final int numberOfInstances = filter.numberOfInstances();
         if (numberOfInstances > 1)
             return result.withRouter(new RoundRobinPool(numberOfInstances));
@@ -33,8 +33,7 @@ public class FilterActor extends ComponentActor {
 
     @Override
     protected void consume(final Message inMsg) {
-        final Envelope envelope = filter.filter(inMsg);
-        connection(envelope.destination).put(envelope.message);
+        filter.filter(inMsg).ifPresent(e -> connection(e.destination).put(e.message));
     }
 
     private Connection connection(final Optional<String> optionalDestination) {
