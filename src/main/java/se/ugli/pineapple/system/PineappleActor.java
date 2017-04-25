@@ -9,7 +9,7 @@ public class PineappleActor extends AbstractActor {
 
     public PineappleActor(final Model model, final Discovery discovery) {
         model.pumps.forEach(c -> context().actorOf(PumpActor.props(c, discovery)));
-        model.filters.forEach(c -> context().actorOf(SimpleFilterActor.props(c, discovery)));
+        model.filters.forEach(c -> context().actorOf(FilterActor.props(c, discovery)));
         model.sinks.forEach(c -> context().actorOf(SinkActor.props(c, discovery)));
     }
 

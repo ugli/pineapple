@@ -6,7 +6,7 @@
     <artifactId>pineapple</artifactId>
     <packaging>jar</packaging>
     <name>Pineapple</name>
-    <version>1.8.0.0</version>
+    <version>1.8.1.0</version>
     <description>pineapple</description>
     <url>https://github.com/ugli/pineapple</url>
     <licenses>
@@ -20,7 +20,7 @@
         <connection>scm:git:git@github.com:ugli/pineapple.git</connection>
         <developerConnection>scm:git:git@github.com:ugli/pineapple.git</developerConnection>
         <url>git@github.com:ugli/pineapple.git</url>
-        <tag>v1.8.0.0</tag>
+        <tag>v1.8.1.0</tag>
     </scm>
     <developers>
         <developer>

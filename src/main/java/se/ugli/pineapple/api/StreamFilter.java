@@ -1,6 +1,6 @@
 package se.ugli.pineapple.api;
 
-import static se.ugli.pineapple.api.ConsumeType.PULL;
+import static se.ugli.pineapple.api.ConsumeType.STREAM;
 
 import java.util.stream.Stream;
 
@@ -11,6 +11,11 @@ import se.ugli.jocote.Message;
 public interface StreamFilter extends Filter {
 
     Stream<Envelope> filter(Stream<Message> messages);
+
+    @Override
+    default ConsumeType consumeType() {
+        return STREAM;
+    }
 
     static StreamFilterBuilder builder(final StreamFilter filter) {
         return new StreamFilterBuilder(filter);
@@ -26,7 +31,7 @@ public interface StreamFilter extends Filter {
 
         @Override
         public StreamFilter build() {
-            return new StreamFilterImpl(filter, numberOfInstances, PULL, idleDuration(), streamLimit);
+            return new StreamFilterImpl(filter, numberOfInstances, STREAM, idleDuration(), streamLimit);
         }
 
         static class StreamFilterImpl extends ConfigurationBase implements StreamFilter {

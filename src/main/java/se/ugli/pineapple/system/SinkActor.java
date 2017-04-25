@@ -1,5 +1,7 @@
 package se.ugli.pineapple.system;
 
+import java.util.stream.Stream;
+
 import akka.actor.Props;
 import akka.routing.RoundRobinPool;
 import se.ugli.jocote.Message;
@@ -26,6 +28,11 @@ public class SinkActor extends ComponentActor {
     @Override
     protected void consume(final Message message) {
         connectionByDestination.values().forEach(c -> c.put(message));
+    }
+
+    @Override
+    protected boolean consume(final Stream<Message> messages) {
+        throw new UnsupportedOperationException();
     }
 
 }

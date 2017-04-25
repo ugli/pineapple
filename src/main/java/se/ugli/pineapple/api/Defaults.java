@@ -12,7 +12,7 @@ import se.ugli.pineapple.discovery.SpringDiscovery;
 class Defaults {
 
     static final TimeUnit IDLE_TIME_UNIT = MILLISECONDS;
-    static final long IDLE_TIME = 500l;
+    static final long IDLE_TIME = 50l;
     static final FiniteDuration IDLE_DURATION = Duration.create(IDLE_TIME, IDLE_TIME_UNIT);
     static final int NUMBER_OF_INSTANCES = 1;
     static final ConsumeType CONSUME_TYPE = PULL;

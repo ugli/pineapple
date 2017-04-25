@@ -1,6 +1,7 @@
 package se.ugli.pineapple.system;
 
 import static se.ugli.pineapple.api.ConsumeType.PULL;
+import static se.ugli.pineapple.api.ConsumeType.STREAM;
 import static se.ugli.pineapple.api.ConsumeType.SUBSCRIBE;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,22 +43,22 @@ abstract class ComponentActor extends AbstractActor {
         consumeType = configuration.consumeType();
         idleDurationSupplier = configuration::idleDuration;
         componentName = component.name;
-        log.info("[{}] creating {}", componentName, component.type());
+        log.info("[{}] creating {} with {}", componentName, component.type(), consumeType);
         component.getIn().forEach(p -> connectIn(discovery.pipe(p.name).url()));
         component.getOut().forEach(p -> connectOut(p.to.name, discovery.pipe(p.name).url()));
-        if (consumeType == PULL)
-            inConnections.forEach(c -> self().tell(c, self()));
     }
 
+    @SuppressWarnings("resource")
     protected void connectIn(final String url) {
         if (consumeType == SUBSCRIBE) {
             log.info("[{}] added subscription {}", componentName, url);
             subscriptions.add(Jocote.subscribe(url, m -> self().tell(m, self())));
         }
-        else if (consumeType == PULL) {
+        else if (consumeType == PULL || consumeType == STREAM) {
             log.info("[{}] added in connection {}", componentName, url);
-            inConnections.add(Jocote.connect(url));
-            subscriptions.add(Jocote.subscribe(url, m -> self().tell(m, self())));
+            final Connection connection = Jocote.connect(url);
+            inConnections.add(connection);
+            noIdle(connection);
         }
         else
             throw new IllegalStateException(Objects.toString(consumeType));
@@ -77,24 +79,47 @@ abstract class ComponentActor extends AbstractActor {
 
     @Override
     public Receive createReceive() {
-        return receiveBuilder().match(Message.class, this::consume).match(Connection.class, this::pull)
+        return receiveBuilder().match(Message.class, this::consume).match(Connection.class, this::action)
                 .matchAny(this::unknown).build();
+    }
+
+    private void action(final Connection connection) {
+        if (consumeType == PULL)
+            pull(connection);
+        else
+            stream(connection);
+
+    }
+
+    private void stream(final Connection connection) {
+        if (consume(connection.messageStream()))
+            noIdle(connection);
+        else
+            idle(connection);
     }
 
     private void pull(final Connection connection) {
         final Optional<Message> optMsg = connection.get();
         if (optMsg.isPresent()) {
             consume(optMsg.get());
-            self().tell(connection, self());
+            noIdle(connection);
         }
-        else {
-            final ActorSystem system = context().system();
-            system.scheduler().scheduleOnce(idleDurationSupplier.get(), self(), connection, system.dispatcher(),
-                    self());
-        }
+        else
+            idle(connection);
+    }
+
+    private void idle(final Connection connection) {
+        final ActorSystem system = context().system();
+        system.scheduler().scheduleOnce(idleDurationSupplier.get(), self(), connection, system.dispatcher(), self());
+    }
+
+    private void noIdle(final Connection connection) {
+        self().tell(connection, self());
     }
 
     protected abstract void consume(Message message);
+
+    protected abstract boolean consume(Stream<Message> messages);
 
     private void unknown(final Object message) {
         throw new IllegalStateException("Unknown message type: " + message.getClass().getName());

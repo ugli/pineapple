@@ -1,7 +1,12 @@
 package se.ugli.pineapple.system;
 
+import static java.util.stream.Collectors.groupingBy;
+
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import akka.actor.Props;
 import akka.routing.RoundRobinPool;
@@ -9,22 +14,24 @@ import se.ugli.jocote.Connection;
 import se.ugli.jocote.Message;
 import se.ugli.pineapple.PineappleException;
 import se.ugli.pineapple.api.Discovery;
+import se.ugli.pineapple.api.Envelope;
+import se.ugli.pineapple.api.Filter;
 import se.ugli.pineapple.api.SimpleFilter;
+import se.ugli.pineapple.api.StreamFilter;
 import se.ugli.pineapple.model.Component;
 
-public class SimpleFilterActor extends ComponentActor {
+public class FilterActor extends ComponentActor {
 
-    private final SimpleFilter filter;
+    private final Filter filter;
 
-    public SimpleFilterActor(final SimpleFilter filter, final Component component, final Discovery discovery) {
+    public FilterActor(final Filter filter, final Component component, final Discovery discovery) {
         super(filter, component, discovery);
         this.filter = filter;
     }
 
     public static Props props(final Component component, final Discovery discovery) {
-        final SimpleFilter filter = (SimpleFilter) discovery.filter(component.name);
-        final Props result = Props.create(SimpleFilterActor.class,
-                () -> new SimpleFilterActor(filter, component, discovery));
+        final Filter filter = discovery.filter(component.name);
+        final Props result = Props.create(FilterActor.class, () -> new FilterActor(filter, component, discovery));
         final int numberOfInstances = filter.numberOfInstances();
         if (numberOfInstances > 1)
             return result.withRouter(new RoundRobinPool(numberOfInstances));
@@ -33,7 +40,18 @@ public class SimpleFilterActor extends ComponentActor {
 
     @Override
     protected void consume(final Message inMsg) {
-        filter.filter(inMsg).ifPresent(e -> connection(e.destination).put(e.message));
+        ((SimpleFilter) filter).filter(inMsg).ifPresent(e -> connection(e.destination).put(e.message));
+    }
+
+    @Override
+    protected boolean consume(final Stream<Message> messages) {
+        final Map<Optional<String>, List<Envelope>> map = ((StreamFilter) filter)
+                .filter(messages.limit(filter.streamLimit())).collect(groupingBy(e -> e.destination));
+        map.entrySet().forEach(e -> {
+            final Stream<Message> newMessages = e.getValue().stream().map(s -> s.message);
+            connection(e.getKey()).put(newMessages);
+        });
+        return !map.isEmpty();
     }
 
     private Connection connection(final Optional<String> optionalDestination) {
